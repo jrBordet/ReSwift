@@ -8,19 +8,13 @@
 import Foundation
 import Combine
 
-// typealias Middleware<State, Action> =
-// (State, Action) -> AnyPublisher<Action, Never>
-//  (State, Action) -> State
-
-typealias Reducer<State, Action> = (State, Action) -> State
-
-class Store<State, Action>: ObservableObject {
+public class Store<State, Action>: ObservableObject {
 	@Published private(set) var state: State
 	
 	private let reducer: Reducer<State, Action>
 	
 	private let queue = DispatchQueue(
-		label: "com.raywenderlich.ThreeDucks.store",
+		label: "com.jrbordet.redux.store",
 		qos: .userInitiated
 	)
 	
@@ -28,7 +22,7 @@ class Store<State, Action>: ObservableObject {
 	
 	private var subscriptions: Set<AnyCancellable> = []
 	
-	init(
+	public init(
 		initial: State,
 		reducer: @escaping Reducer<State, Action>,
 		middlewares: [Middleware<State, Action>] = []
@@ -54,8 +48,12 @@ class Store<State, Action>: ObservableObject {
 	
 	// MARK: - Interface
 	
-	func dispatch(_ action: Action) {
-		queue.sync {
+	public func dispatch(_ action: Action) {
+		queue.sync { [weak self] in
+			guard let self = self else {
+				return
+			}
+			
 			self.dispatch(self.state, action)
 		}
 	}
