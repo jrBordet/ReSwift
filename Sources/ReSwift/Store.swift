@@ -9,7 +9,10 @@ import Foundation
 import Combine
 
 public class Store<State, Action>: ObservableObject {
-	@Published private(set) var state: State
+//	@Published private(set) var state: State
+	
+	@Published public var state: State
+
 	
 	private let reducer: Reducer<State, Action>
 	
