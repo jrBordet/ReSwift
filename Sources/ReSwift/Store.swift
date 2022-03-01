@@ -9,22 +9,15 @@ import Foundation
 import Combine
 
 public class Store<State, Action>: ObservableObject {
-//	@Published private(set) var state: State
-	
-	@Published public var state: State
-
-	
+	@Published public private(set) var state: State
+		
 	private let reducer: Reducer<State, Action>
 	
-	private let queue = DispatchQueue(
-		label: "com.jrbordet.redux.store",
-		qos: .userInitiated
-	)
+	var tasks = [AnyCancellable]()
 	
 	private let middlewares: [Middleware<State, Action>]
-	
-	private var subscriptions: Set<AnyCancellable> = []
-	
+	private var middlewareCancellables: Set<AnyCancellable> = []
+		
 	public init(
 		initial: State,
 		reducer: @escaping Reducer<State, Action>,
@@ -35,30 +28,21 @@ public class Store<State, Action>: ObservableObject {
 		self.middlewares = middlewares
 	}
 	
-	private func dispatch(_ currentState: State, _ action: Action) {
-		let newState = reducer(currentState, action)
-		
-		middlewares.forEach { middleware in
-			let publisher = middleware(newState, action)
-			publisher
-				.receive(on: DispatchQueue.main)
-				.sink(receiveValue: dispatch)
-				.store(in: &subscriptions)
-		}
-		
-		state = newState
-	}
-	
 	// MARK: - Interface
 	
 	public func dispatch(_ action: Action) {
-		queue.sync { [weak self] in
-			guard let self = self else {
-				return
+		reducer(&state, action)
+ 
+		// Dispatch all middleware functions
+		for mw in middlewares {
+			guard let middleware = mw(state, action) else {
+				break
 			}
 			
-			self.dispatch(self.state, action)
+			middleware
+				.receive(on: DispatchQueue.main)
+				.sink(receiveValue: dispatch)
+				.store(in: &middlewareCancellables)
 		}
 	}
-	
 }

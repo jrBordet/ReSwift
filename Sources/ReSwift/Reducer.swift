@@ -7,4 +7,4 @@
 
 import Foundation
 
-public typealias Reducer<State, Action> = (State, Action) -> State
+public typealias Reducer<State, Action> = (inout State, Action) -> Void//State

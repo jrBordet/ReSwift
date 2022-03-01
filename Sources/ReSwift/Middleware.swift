@@ -8,4 +8,4 @@
 import Foundation
 import Combine
 
-public typealias Middleware<State, Action> = (State, Action) -> AnyPublisher<Action, Never>
+public typealias Middleware<State, Action> = (State, Action) -> AnyPublisher<Action, Never>?
