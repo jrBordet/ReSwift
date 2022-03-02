@@ -54,10 +54,10 @@ public class TestStore<State, Action>: ObservableObject {
 }
 
 extension TestStore {
-	public func assertDispatch(
-		step: StepType,
-		action: Action,
-		update: @escaping (inout State) -> Void,
+	public func assert(
+		step: StepType = .send,
+		when action: Action,
+		then: @escaping (inout State) -> Void,
 		file: StaticString = #file,
 		line: UInt = #line
 	) where State: Equatable {
@@ -85,7 +85,7 @@ extension TestStore {
 							return
 						}
 						
-						update(&expected)
+						then(&expected)
 						
 						XCTAssertEqual(expected, self.state, file: file, line: line)
 												
