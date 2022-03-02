@@ -8,6 +8,11 @@
 import Foundation
 import Combine
 import XCTest
+import Difference
+
+public func XCTAssertEqual<T: Equatable>(_ expected: T, _ received: T, file: StaticString = #file, line: UInt = #line) {
+	XCTAssertTrue(expected == received, "Found difference for \n" + diff(received, expected).joined(separator: ", "), file: file, line: line)
+}
 
 public class TestStore<State, Action>: ObservableObject {
 	@Published public private(set) var state: State
