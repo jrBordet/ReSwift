@@ -22,7 +22,7 @@ let package = Package(
 			name: "Difference",
 			url: "https://github.com/krzysztofzablocki/Difference.git",
 			.branch("master")
-		)
+		),
 	],
 	targets: [
 		// Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -30,13 +30,11 @@ let package = Package(
 		.target(
 			name: "ReSwift",
 			dependencies: [
-				"Difference"
 			]),
 		.testTarget(
 			name: "ReSwiftTests",
 			dependencies: [
 				"ReSwift",
-				"Difference"
 			]),
 	]
 )
